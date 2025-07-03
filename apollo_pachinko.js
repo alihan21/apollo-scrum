@@ -1,5 +1,6 @@
 (function() {
     function pachinkoAnimation(team, onComplete) {
+    console.log("apolloPachinko loaded");
     // remove old board
     const old = document.getElementById("scrum-pachinko");
     if (old) old.remove();
