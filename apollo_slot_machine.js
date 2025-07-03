@@ -40,10 +40,10 @@
         // Add horizontal line with small border, centered vertically to show selection line
         const selectionLine = document.createElement("div");
         selectionLine.style.cssText = `
-            position: absolute;
+             position: absolute;
             top: 50%;
-            left: 0;
-            width: 100%;
+            left: 4px;    /* offset from left border */
+            width: calc(100% - 8px);  /* subtract left + right border */
             height: 3px;
             background: #0ff;
             box-shadow: 0 0 10px #0ff;
@@ -75,6 +75,9 @@
                 align-items: center;
                 justify-content: center;
                 width: 100%;
+                border-top: 1px solid #0ff;
+                border-bottom: 1px solid #0ff;
+                box-sizing: border-box;
             `;
             inner.appendChild(entry);
         });
