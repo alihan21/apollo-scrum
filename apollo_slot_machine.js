@@ -1,84 +1,96 @@
 (function () {
     function slotMachineAnimation(team, onComplete) {
-        const old = document.getElementById("scrum-slot");
+        const old = document.getElementById("scrum-slot-machine");
         if (old) old.remove();
 
-        const wrapper = document.createElement("div");
-        wrapper.id = "scrum-slot";
-        wrapper.style.cssText = `
+        const board = document.createElement("div");
+        board.id = "scrum-slot-machine";
+        board.style.cssText = `
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0,0,0,0.8);
             z-index: 10000;
             display: flex;
             justify-content: center;
             align-items: center;
         `;
 
+        const machine = document.createElement("div");
+        machine.style.cssText = `
+            position: relative;
+            width: 300px;
+            height: 300px;
+            overflow: hidden;
+            border: 4px solid #0ff;
+            border-radius: 16px;
+            background: #111;
+            box-shadow: 0 0 20px #0ff;
+        `;
+
         const reel = document.createElement("div");
         reel.style.cssText = `
-            height: 200px;
-            width: 200px;
-            overflow: hidden;
-            border: 4px solid #0f0;
-            background: #111;
-            font-size: 32px;
-            font-weight: bold;
-            color: #0f0;
+            position: absolute;
+            top: 0;
+            width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
+            transition: transform 1s ease-out;
         `;
 
-        const inner = document.createElement("div");
-        inner.style.cssText = `
-            display: flex;
-            flex-direction: column;
-            transition: transform 3s cubic-bezier(0.25, 1, 0.5, 1);
-        `;
-
-        // Duplicate team names multiple times for better illusion
-        const extendedList = [];
-        for (let i = 0; i < 20; i++) {
-            extendedList.push(...team);
-        }
-
-        extendedList.forEach(name => {
-            const entry = document.createElement("div");
-            entry.textContent = name;
-            entry.style.cssText = `
-                height: 50px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
+        const shuffle = [...team, ...team, ...team]; // Repeat to simulate spinning
+        shuffle.forEach(name => {
+            const item = document.createElement("div");
+            item.textContent = name;
+            item.style.cssText = `
                 width: 100%;
+                height: 60px;
+                text-align: center;
+                font-size: 20px;
+                font-weight: bold;
+                color: #0ff;
+                border-top: 1px solid #0ff22;
+                border-bottom: 1px solid #0ff22;
+                line-height: 60px;
             `;
-            inner.appendChild(entry);
+            reel.appendChild(item);
         });
 
-        reel.appendChild(inner);
-        wrapper.appendChild(reel);
-        document.body.appendChild(wrapper);
+        // Highlight center line
+        const highlightLine = document.createElement("div");
+        highlightLine.style.cssText = `
+            position: absolute;
+            top: 120px;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            border-top: 2px solid #f0f;
+            border-bottom: 2px solid #f0f;
+            pointer-events: none;
+        `;
 
-        // Spin
-        const targetIndex = Math.floor(Math.random() * team.length);
-        const winner = team[targetIndex];
-        const finalIndex = extendedList.lastIndexOf(winner);
-        const offset = finalIndex * 50;
+        machine.appendChild(reel);
+        machine.appendChild(highlightLine);
+        board.appendChild(machine);
+        document.body.appendChild(board);
 
-        // Animate scroll
-        requestAnimationFrame(() => {
-            inner.style.transform = `translateY(-${offset}px)`;
-        });
+        // Spin animation
+        const finalIndex = Math.floor(Math.random() * team.length);
+        const offset = (shuffle.length - finalIndex - 1) * 60;
 
         setTimeout(() => {
-            wrapper.remove();
+            reel.style.transition = "transform 2s cubic-bezier(0.33, 1, 0.68, 1)";
+            reel.style.transform = `translateY(-${offset}px)`;
+        }, 100);
+
+        setTimeout(() => {
+            const winner = shuffle[shuffle.length - finalIndex - 1];
+            board.remove();
             onComplete(winner);
-        }, 3200);
+        }, 2200);
     }
 
     window.apolloSlotMachine = {
