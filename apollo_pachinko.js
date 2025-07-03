@@ -1,4 +1,5 @@
-function pachinkoAnimation(team, onComplete) {
+(function() {
+    function pachinkoAnimation(team, onComplete) {
     // remove old board
     const old = document.getElementById("scrum-pachinko");
     if (old) old.remove();
@@ -107,8 +108,9 @@ function pachinkoAnimation(team, onComplete) {
             }, 1000);
         }
     }, 30);
+}
 
-    window.apolloPachinko = {
+window.apolloPachinko = {
         run: pachinkoAnimation
     };
-}
+})();
