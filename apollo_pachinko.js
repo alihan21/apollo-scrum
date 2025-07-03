@@ -103,7 +103,7 @@ function pachinkoAnimation(team, onComplete) {
 
             setTimeout(() => {
                 board.remove();
-                onFinish(winner);
+                onComplete(winner);
             }, 1000);
         }
     }, 30);
