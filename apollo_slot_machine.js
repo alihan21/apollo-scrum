@@ -1,11 +1,11 @@
 (function () {
     function slotMachineAnimation(team, onComplete) {
-        const old = document.getElementById("scrum-slot-machine");
+        const old = document.getElementById("scrum-slot");
         if (old) old.remove();
 
-        const board = document.createElement("div");
-        board.id = "scrum-slot-machine";
-        board.style.cssText = `
+        const wrapper = document.createElement("div");
+        wrapper.id = "scrum-slot";
+        wrapper.style.cssText = `
             position: fixed;
             top: 0;
             left: 0;
@@ -18,79 +18,86 @@
             align-items: center;
         `;
 
-        const machine = document.createElement("div");
-        machine.style.cssText = `
-            position: relative;
-            width: 300px;
-            height: 300px;
-            overflow: hidden;
-            border: 4px solid #0ff;
-            border-radius: 16px;
-            background: #111;
-            box-shadow: 0 0 20px #0ff;
-        `;
-
         const reel = document.createElement("div");
         reel.style.cssText = `
-            position: absolute;
-            top: 0;
-            width: 100%;
+            height: 200px;
+            width: 200px;
+            overflow: hidden;
+            border: 4px solid #0ff; /* changed green border to cyan */
+            background: #111;
+            font-size: 28px;
+            font-weight: bold;
+            color: #0ff; /* cyan text */
             display: flex;
             flex-direction: column;
             align-items: center;
-            transition: transform 1s ease-out;
+            justify-content: flex-start;
+            position: relative;
+            border-radius: 16px; /* match pachinko rounded corners */
+            box-shadow: 0 0 15px #0ff; /* glow effect */
         `;
 
-        const shuffle = [...team, ...team, ...team]; // Repeat to simulate spinning
-        shuffle.forEach(name => {
-            const item = document.createElement("div");
-            item.textContent = name;
-            item.style.cssText = `
-                width: 100%;
-                height: 60px;
-                text-align: center;
-                font-size: 20px;
-                font-weight: bold;
-                color: #0ff;
-                border-top: 1px solid #0ff22;
-                border-bottom: 1px solid #0ff22;
-                line-height: 60px;
-            `;
-            reel.appendChild(item);
-        });
-
-        // Highlight center line
-        const highlightLine = document.createElement("div");
-        highlightLine.style.cssText = `
+        // Add horizontal line with small border, centered vertically to show selection line
+        const selectionLine = document.createElement("div");
+        selectionLine.style.cssText = `
             position: absolute;
-            top: 120px;
+            top: 50%;
             left: 0;
             width: 100%;
-            height: 60px;
-            border-top: 2px solid #f0f;
-            border-bottom: 2px solid #f0f;
+            height: 3px;
+            background: #0ff;
+            box-shadow: 0 0 10px #0ff;
             pointer-events: none;
+            border-radius: 2px;
+            z-index: 10;
+        `;
+        reel.appendChild(selectionLine);
+
+        const inner = document.createElement("div");
+        inner.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            transition: transform 3s cubic-bezier(0.25, 1, 0.5, 1);
         `;
 
-        machine.appendChild(reel);
-        machine.appendChild(highlightLine);
-        board.appendChild(machine);
-        document.body.appendChild(board);
+        // Duplicate team names multiple times for better illusion
+        const extendedList = [];
+        for (let i = 0; i < 20; i++) {
+            extendedList.push(...team);
+        }
 
-        // Spin animation
-        const finalIndex = Math.floor(Math.random() * team.length);
-        const offset = (shuffle.length - finalIndex - 1) * 60;
+        extendedList.forEach(name => {
+            const entry = document.createElement("div");
+            entry.textContent = name;
+            entry.style.cssText = `
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+            `;
+            inner.appendChild(entry);
+        });
+
+        reel.appendChild(inner);
+        wrapper.appendChild(reel);
+        document.body.appendChild(wrapper);
+
+        // Spin
+        const targetIndex = Math.floor(Math.random() * team.length);
+        const winner = team[targetIndex];
+        const finalIndex = extendedList.lastIndexOf(winner);
+        const offset = finalIndex * 50;
+
+        // Animate scroll
+        requestAnimationFrame(() => {
+            inner.style.transform = `translateY(-${offset}px)`;
+        });
 
         setTimeout(() => {
-            reel.style.transition = "transform 2s cubic-bezier(0.33, 1, 0.68, 1)";
-            reel.style.transform = `translateY(-${offset}px)`;
-        }, 100);
-
-        setTimeout(() => {
-            const winner = shuffle[shuffle.length - finalIndex - 1];
-            board.remove();
+            wrapper.remove();
             onComplete(winner);
-        }, 2200);
+        }, 3200);
     }
 
     window.apolloSlotMachine = {
