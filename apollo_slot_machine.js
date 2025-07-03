@@ -57,7 +57,7 @@
         inner.style.cssText = `
             display: flex;
             flex-direction: column;
-            transition: transform 3s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: transform 4s cubic-bezier(0.22, 1, 0.36, 1);
         `;
 
         // Duplicate team names multiple times for better illusion
