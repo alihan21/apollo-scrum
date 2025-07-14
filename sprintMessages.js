@@ -25,6 +25,7 @@ function createSprintMessageBox() {
             <li>PCR#30 FAD: <b>31 July</b></li>
             <li>PCR#74 FAD: <b>31 July</b></li>
             <li>PCR#55 Delivery: <b>02 August</b></li>
+            <li>PCR#55 Delivery: <b>02 August</b></li>
             <li>TEST LAFE WTF</b></li>
         </ul>
     `;
