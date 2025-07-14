@@ -8,7 +8,7 @@ function createSprintProgressBar() {
        width: 90%;
        height: 20px;
        background: #222;
-       border: 9px solid #0ff;
+       border: 3px solid #0ff;
        border-radius: 8px;
        z-index: 9999;
        display: flex;
