@@ -40,7 +40,7 @@ function createSprintProgressBar() {
 
     // "Sprint ends in X days" label
     const countdownLabel = document.createElement("div");
-    countdownLabel.textContent = `🚀 Sprint ends in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}`;
+    countdownLabel.textContent = `🚀 Sprint ends in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''} 🚀`;
     countdownLabel.style.cssText = `
         font-size: 16px;
         font-weight: bold;
