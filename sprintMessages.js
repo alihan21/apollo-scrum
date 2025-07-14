@@ -27,7 +27,7 @@ function createSprintMessageBox(goals, messages) {
     const goalsHtmlList = goals.map(msg => `<li>${msg}</li>`).join("");
 
     // Sprint Deadlines 
-    const messagesHtmlList = messages.map(item => `<li>${item.label}: <b>${item.date}</b></li>`).join("");
+    const messagesHtmlList = messages.map(msg => `<li>${msg}</li>`).join("");
 
     // Inner HTML with two sections
     box.innerHTML = `
