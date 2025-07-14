@@ -26,7 +26,6 @@ function createSprintProgressBar() {
     const daysSinceStart = Math.floor(diff / MS_IN_DAY);
     const sprintDay = daysSinceStart % 14;
 
-    // Calculate working day (0-9) → only Mon–Fri × 2
     const workingDayIndex = (() => {
         let count = 0;
         for (let i = 0; i <= sprintDay; i++) {
@@ -38,19 +37,17 @@ function createSprintProgressBar() {
 
     const daysRemaining = 9 - workingDayIndex;
 
-    // "Sprint ends in X days" label
+    // Non-glowing countdown label
     const countdownLabel = document.createElement("div");
     countdownLabel.textContent = `🚀 Sprint ends in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''} 🚀`;
     countdownLabel.style.cssText = `
         font-size: 16px;
         font-weight: bold;
         color: #0ff;
-        text-shadow: 0 0 6px #0ff;
         margin-bottom: 10px;
     `;
     container.appendChild(countdownLabel);
 
-    // Bar row container
     const barRow = document.createElement("div");
     barRow.style.cssText = `
         display: flex;
@@ -87,7 +84,7 @@ function createSprintProgressBar() {
                 : i === workingDayIndex
                     ? "#0f0"
                     : "#444"};
-            border-left: ${i === 5 ? "2px solid #0ff" : "none"};
+            border-left: ${i === 5 ? "4px solid #0ff" : "none"};
             border-radius: 2px;
             box-shadow: ${i === workingDayIndex ? "0 0 10px 3px #0f0" : "none"};
         `;
