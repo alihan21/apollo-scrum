@@ -1,4 +1,4 @@
-function createSprintMessageBox() {
+function createSprintMessageBox(messages) {
     const box = document.createElement("div");
     box.id = "sprint-message-box";
     box.style.cssText = `
@@ -17,16 +17,10 @@ function createSprintMessageBox() {
         z-index: 9999;
     `;
 
-    box.innerHTML = `
-        <strong>🚀 Upcoming Deadlines 🚀</strong><br/>
-        <ul style="padding-left: 16px; margin-top: 8px;">
-            <li>Sprint End: <b>25 July</b></li>
-            <li>PCR#58 FAD: <b>31 July</b></li>
-            <li>PCR#30 FAD: <b>31 July</b></li>
-            <li>PCR#74 FAD: <b>31 July</b></li>
-            <li>PCR#55 Delivery: <b>02 August </b></li>
-        </ul>
-    `;
+    // Build messages HTML dynamically from array of messages
+    const htmlList = messages.map(msg => `<li>${msg}</li>`).join("");
+    box.innerHTML = `<strong>🚀 Upcoming Deadlines 🚀</strong><br/><ul>${htmlList}</ul>`;
+    
     document.body.appendChild(box);
 
     makeElementDraggable(box);
