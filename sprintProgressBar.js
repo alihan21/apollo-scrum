@@ -4,15 +4,18 @@ function createSprintProgressBar() {
     container.style.cssText = `
        position: fixed;
        top: 50px;
-       left: 50px; /* changed from 50% */
+       left: 50px;
        width: 90%;
-       height: 20px;
-       background: #222;
+       background: rgba(0,0,0,0.9);
        border: 3px solid #0ff;
        border-radius: 8px;
        z-index: 9999;
        display: flex;
-       overflow: hidden;
+       flex-direction: column;
+       align-items: center;
+       padding: 10px;
+       box-shadow: 0 0 8px #0ff;
+       user-select: none;
        cursor: grab;
     `;
 
@@ -30,62 +33,72 @@ function createSprintProgressBar() {
             const dayOfWeek = (sprintStartReference.getUTCDay() + i) % 7;
             if (dayOfWeek >= 1 && dayOfWeek <= 5) count++;
         }
-        return count - 1; // because we counted today too
+        return count - 1;
     })();
 
-    const barContainer = document.createElement("div");
-    barContainer.style.cssText = `
-        flex: 1;
+    const daysRemaining = 9 - workingDayIndex;
+
+    // "Sprint ends in X days" label
+    const countdownLabel = document.createElement("div");
+    countdownLabel.textContent = `🚀 Sprint ends in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}`;
+    countdownLabel.style.cssText = `
+        font-size: 16px;
+        font-weight: bold;
+        color: #0ff;
+        text-shadow: 0 0 6px #0ff;
+        margin-bottom: 10px;
+    `;
+    container.appendChild(countdownLabel);
+
+    // Bar row container
+    const barRow = document.createElement("div");
+    barRow.style.cssText = `
         display: flex;
-        height: 100%;
-        gap: 2px;
+        align-items: flex-end;
+        width: 100%;
+        gap: 4px;
     `;
 
     for (let i = 0; i < 10; i++) {
+        const barWrapper = document.createElement("div");
+        barWrapper.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        `;
+
+        const label = document.createElement("div");
+        label.style.cssText = `
+            color: #0ff;
+            font-size: 12px;
+            margin-bottom: 4px;
+            text-align: center;
+            height: 16px;
+        `;
+        label.textContent = i === 0 ? "Sprint Week 1" : (i === 9 ? "Sprint Week 2" : "");
+
         const bar = document.createElement("div");
-        bar.style.flex = "1";
-        bar.style.height = "100%";
-        bar.style.borderRadius = "2px";
-        bar.style.background = i < workingDayIndex
-            ? "#0ff"
-            : i === workingDayIndex
-            ? "#0f0"
-            : "#444";
+        bar.style.cssText = `
+            width: 100%;
+            height: 20px;
+            background: ${i < workingDayIndex
+                ? "#0ff"
+                : i === workingDayIndex
+                    ? "#0f0"
+                    : "#444"};
+            border-left: ${i === 5 ? "2px solid #0ff" : "none"};
+            border-radius: 2px;
+            box-shadow: ${i === workingDayIndex ? "0 0 10px 3px #0f0" : "none"};
+        `;
 
-        // Add vertical divider between week 1 and 2
-        if (i === 5) {
-            bar.style.borderLeft = "2px solid #0ff";
-        }
-
-        bar.style.boxShadow = i === workingDayIndex ? "0 0 6px #0f0" : "none";
-
-        barContainer.appendChild(bar);
+        barWrapper.appendChild(label);
+        barWrapper.appendChild(bar);
+        barRow.appendChild(barWrapper);
     }
 
-    const labelLeft = document.createElement("span");
-    labelLeft.textContent = "Sprint Week 1";
-    labelLeft.style.cssText = `
-        color: #0ff;
-        font-size: 12px;
-        margin-right: 10px;
-        white-space: nowrap;
-    `;
-
-    const labelRight = document.createElement("span");
-    labelRight.textContent = "Sprint Week 2";
-    labelRight.style.cssText = `
-        color: #0ff;
-        font-size: 12px;
-        margin-left: 10px;
-        white-space: nowrap;
-    `;
-
-    container.appendChild(labelLeft);
-    container.appendChild(barContainer);
-    container.appendChild(labelRight);
-
+    container.appendChild(barRow);
     document.body.appendChild(container);
-
     makeElementDraggable(container);
 }
 
