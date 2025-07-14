@@ -84,11 +84,24 @@ function createSprintProgressBar() {
                 : i === workingDayIndex
                     ? "#0f0"
                     : "#444"};
-            border-left: ${i === 5 ? "4px solid #0ff" : "none"};
             border-radius: 2px;
             box-shadow: ${i === workingDayIndex ? "0 0 10px 3px #0f0" : "none"};
         `;
 
+        if (i === 5) {
+            const divider = document.createElement("div");
+            divider.style.cssText = `
+                position: absolute;
+                width: 4px;
+                height: 40px;
+                background: #0ff;
+                top: -10px;
+                z-index: 1;
+            `;
+            barWrapper.style.position = "relative";
+            barWrapper.appendChild(divider);
+        }
+        
         barWrapper.appendChild(label);
         barWrapper.appendChild(bar);
         barRow.appendChild(barWrapper);
