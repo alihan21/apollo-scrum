@@ -26,18 +26,21 @@ function createSprintProgressBar() {
     const daysSinceStart = Math.floor(diff / MS_IN_DAY);
     const sprintDay = daysSinceStart % 14;
 
+    // Adjusted for 9 working days (Mon–Fri + Mon–Thu)
     const workingDayIndex = (() => {
         let count = 0;
         for (let i = 0; i <= sprintDay; i++) {
             const dayOfWeek = (sprintStartReference.getUTCDay() + i) % 7;
-            if (dayOfWeek >= 1 && dayOfWeek <= 5) count++;
+            if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+                count++;
+                if (count >= 9) break; // cap at 9 working days
+            }
         }
-        return count - 1;
+        return Math.max(0, count - 1); // subtract 1 to make index (0–8)
     })();
 
-    const daysRemaining = 9 - workingDayIndex;
+    const daysRemaining = Math.max(0, 8 - workingDayIndex);
 
-    // Non-glowing countdown label
     const countdownLabel = document.createElement("div");
     countdownLabel.textContent = `🚀 Sprint ends in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''} 🚀`;
     countdownLabel.style.cssText = `
@@ -56,13 +59,14 @@ function createSprintProgressBar() {
         gap: 4px;
     `;
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 9; i++) {
         const barWrapper = document.createElement("div");
         barWrapper.style.cssText = `
             display: flex;
             flex-direction: column;
             align-items: center;
             flex: 1;
+            position: relative;
         `;
 
         const label = document.createElement("div");
@@ -73,7 +77,7 @@ function createSprintProgressBar() {
             text-align: center;
             height: 16px;
         `;
-        label.textContent = i === 0 ? "Sprint Week 1" : (i === 9 ? "Sprint Week 2" : "");
+        label.textContent = i === 0 ? "Sprint Week 1" : (i === 8 ? "Sprint Week 2" : "");
 
         const bar = document.createElement("div");
         bar.style.cssText = `
@@ -88,20 +92,23 @@ function createSprintProgressBar() {
             box-shadow: ${i === workingDayIndex ? "0 0 10px 3px #0f0" : "none"};
         `;
 
-        if (i === 5) {
+        // Add vertical divider after day 5 (i === 4)
+        if (i === 4) {
             const divider = document.createElement("div");
             divider.style.cssText = `
                 position: absolute;
                 width: 4px;
-                height: 40px;
+                height: 36px;
                 background: #0ff;
-                top: -10px;
+                top: -8px;
+                left: 100%;
+                transform: translateX(-2px);
                 z-index: 1;
+                border-radius: 2px;
             `;
-            barWrapper.style.position = "relative";
             barWrapper.appendChild(divider);
         }
-        
+
         barWrapper.appendChild(label);
         barWrapper.appendChild(bar);
         barRow.appendChild(barWrapper);
