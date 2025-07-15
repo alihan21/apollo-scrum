@@ -100,7 +100,7 @@ function createSprintProgressBar() {
                 width: 4px;
                 height: 36px;
                 background: #0ff;
-                top: -8px;
+                top: 12px;
                 left: 100%;
                 transform: translateX(-2px);
                 z-index: 1;
