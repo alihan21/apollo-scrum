@@ -19,27 +19,14 @@ function createSprintProgressBar() {
        cursor: grab;
     `;
 
-    const MS_IN_DAY = 86400000;
-    const now = new Date();
-    const sprintStartReference = new Date(Date.UTC(2024, 0, 1)); // Jan 1, 2024
-    const diff = now - sprintStartReference;
-    const daysSinceStart = Math.floor(diff / MS_IN_DAY);
-    const sprintDay = daysSinceStart % 14;
+    const sprintDates = getCurrentSprintWorkingDates().slice(1); // 9 working days (including Friday (day of sprint planning)
+        const todayStr = new Date().toISOString().split("T")[0];
 
-    // Adjusted for 9 working days (Mon–Fri + Mon–Thu)
-    const workingDayIndex = (() => {
-        let count = 0;
-        for (let i = 0; i <= sprintDay; i++) {
-            const dayOfWeek = (sprintStartReference.getUTCDay() + i) % 7;
-            if (dayOfWeek >= 1 && dayOfWeek <= 5) {
-                count++;
-                if (count >= 9) break; // cap at 9 working days
-            }
-        }
-        return Math.max(0, count - 1); // subtract 1 to make index (0–8)
-    })();
+        const workingDayIndex = sprintDates.findIndex(date => {
+            return date.toISOString().split("T")[0] === todayStr;
+        });
 
-    const daysRemaining = Math.max(0, 8 - workingDayIndex);
+        const daysRemaining = Math.max(0, 8 - workingDayIndex);
 
     const countdownLabel = document.createElement("div");
     countdownLabel.textContent = `🚀 Sprint ends in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''} 🚀`;
@@ -117,35 +104,4 @@ function createSprintProgressBar() {
     container.appendChild(barRow);
     document.body.appendChild(container);
     makeElementDraggable(container);
-}
-
-// Make draggable
-// TODO LAFE: move method to Util
-function makeElementDraggable(box) {
-    box.onmousedown = function (e) {
-        const editor = document.getElementById("team-editor");
-        if (editor && editor.style.display === "block") return; // skip if editing
-
-        e.preventDefault();
-        let shiftX = e.clientX - box.getBoundingClientRect().left;
-        let shiftY = e.clientY - box.getBoundingClientRect().top;
-
-        function moveAt(x, y) {
-            box.style.left = x - shiftX + 'px';
-            box.style.top = y - shiftY + 'px';
-        }
-
-        function onMouseMove(e) {
-            moveAt(e.pageX, e.pageY);
-        }
-
-        document.addEventListener('mousemove', onMouseMove);
-
-        document.onmouseup = function () {
-            document.removeEventListener('mousemove', onMouseMove);
-            document.onmouseup = null;
-        };
-    };
-
-    box.ondragstart = () => false;
 }
