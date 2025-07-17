@@ -54,7 +54,7 @@ function createSprintStatsBox() {
     box.appendChild(titleBar);
 
     // Dates of the current sprint (9 working days)
-    const sprintDates = getCurrentSprintWorkingDates();
+    const sprintDates = window.getCurrentSprintWorkingDates();
     console.log(sprintDates);
 
     // Pull stored data
