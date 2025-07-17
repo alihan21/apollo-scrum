@@ -5,23 +5,23 @@ function createSprintStatsBox() {
     const box = document.createElement("div");
     box.id = "sprint-stats-box";
     box.style.cssText = `
-    position: fixed;
-    bottom: auto;    /* Important: remove bottom to avoid conflict with top */
-    top: 630px;      /* or some initial top position */
-    left: 20px;
-    width: 320px;
-    max-height: 350px;
-    overflow-y: auto;
-    background: rgba(0,0,0,0.85);
-    color: #0ff;
-    font-size: 14px;
-    padding: 16px;
-    border: 2px solid #0ff;
-    border-radius: 8px;
-    z-index: 9999;
-    user-select: none;
-    cursor: grab;
-`;
+        position: fixed;
+        bottom: auto;    /* remove bottom to avoid conflict with top */
+        top: 630px;      /* initial top position */
+        left: 20px;
+        width: 360px;
+        max-height: 350px;
+        overflow-y: auto;
+        background: rgba(0,0,0,0.85);
+        color: #0ff;
+        font-size: 14px;
+        padding: 16px;
+        border: 2px solid #0ff;
+        border-radius: 8px;
+        z-index: 9999;
+        user-select: none;
+        cursor: grab;
+    `;
 
     // Title with embedded [+] button
     const titleBar = document.createElement("div");
@@ -55,7 +55,6 @@ function createSprintStatsBox() {
 
     // Dates of the current sprint (9 working days)
     const sprintDates = window.getCurrentSprintWorkingDates();
-    console.log(sprintDates);
 
     // Pull stored data
     const data = JSON.parse(localStorage.getItem("sprintResolvedStats") || "{}");
@@ -76,6 +75,7 @@ function createSprintStatsBox() {
         return { dateStr: str, val };
     });
 
+    // Summary stats
     const summary = document.createElement("div");
     summary.innerHTML = `
         <div style="margin-bottom: 10px;">🗓️ <b>Tickets resolved yesterday:</b> ${yesterdayCount}</div>
@@ -83,35 +83,89 @@ function createSprintStatsBox() {
     `;
     box.appendChild(summary);
 
-    // Graph
-    const graph = document.createElement("div");
-    graph.style.cssText = `
-        display: flex;
-        align-items: flex-end;
-        height: 100px;
-        gap: 4px;
+    // === Graph with Y-axis and Dots + Line ===
+    const graphWrapper = document.createElement("div");
+    graphWrapper.style.cssText = `
+        position: relative;
+        height: 120px;
         margin-bottom: 10px;
+        display: flex;
+    `;
+
+    // Y-axis container
+    const yAxis = document.createElement("div");
+    yAxis.style.cssText = `
+        width: 30px;
+        height: 100px;
+        color: #0ff;
+        font-size: 12px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        margin-right: 6px;
+        user-select: none;
     `;
 
     const maxY = Math.max(5, ...dailyCounts.map(d => d.val));
+    const yTicks = 5; // number of Y axis ticks
 
-    dailyCounts.forEach(({ val }) => {
-        const bar = document.createElement("div");
-        bar.style.cssText = `
-            flex: 1;
-            height: ${(val / maxY) * 100}px;
-            background: #0ff;
-            border-radius: 2px;
-            box-shadow: 0 0 4px #0ff;
-        `;
-        graph.appendChild(bar);
+    // Create Y-axis ticks and labels
+    for (let i = yTicks; i >= 0; i--) {
+        const val = Math.round((maxY / yTicks) * i);
+        const tick = document.createElement("div");
+        tick.textContent = val;
+        yAxis.appendChild(tick);
+    }
+
+    graphWrapper.appendChild(yAxis);
+
+    // Canvas for graph line and dots
+    const canvas = document.createElement("canvas");
+    canvas.width = 300;
+    canvas.height = 100;
+    canvas.style.cssText = "background: transparent;";
+    graphWrapper.appendChild(canvas);
+
+    const ctx = canvas.getContext("2d");
+
+    const padding = 10;
+    const graphWidth = canvas.width - 2 * padding;
+    const graphHeight = canvas.height - 2 * padding;
+    const pointCount = dailyCounts.length;
+    const spacing = graphWidth / (pointCount - 1);
+
+    ctx.strokeStyle = "#0ff";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+
+    dailyCounts.forEach(({ val }, i) => {
+        const x = padding + i * spacing - 9;
+        const y = graphHeight - (val / maxY) * graphHeight + padding;
+
+        if (i === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+    });
+    ctx.stroke();
+
+    // Draw dots on graph
+    dailyCounts.forEach(({ val }, i) => {
+        const x = padding + i * spacing - 9;
+        const y = graphHeight - (val / maxY) * graphHeight + padding;
+
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, 2 * Math.PI);
+        ctx.fillStyle = "#0ff";
+        ctx.fill();
     });
 
-    box.appendChild(graph);
+    box.appendChild(graphWrapper);
 
-    // X-axis labels
+    // X-axis labels (dates)
     const labels = document.createElement("div");
-    labels.style.cssText = "display: flex; gap: 4px;";
+    labels.style.cssText = `display: flex; gap: 4px; justify-content: space-between;`;
     sprintDates.forEach(date => {
         const lbl = document.createElement("div");
         lbl.style.cssText = "flex: 1; font-size: 10px; text-align: center;";
